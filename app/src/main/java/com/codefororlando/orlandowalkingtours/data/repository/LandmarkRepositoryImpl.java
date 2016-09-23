@@ -168,11 +168,24 @@ public class LandmarkRepositoryImpl
                 String json = new String(
                         response.data,
                         HttpHeaderParser.parseCharset(response.headers));
-                Type listType = new TypeToken<ArrayList<RemoteLandmark>>() {
-                }.getType();
+                Type mapType = new TypeToken<Map<String, Map<String,RemoteLandmark>>>() {}.getType();
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
-                List<RemoteLandmark> data = gson.fromJson(json, listType);
-                return Response.success(data, HttpHeaderParser.parseCacheHeaders(response));
+                Map<String, Map<String, RemoteLandmark>> data = gson.fromJson(json, mapType);
+                for (Map.Entry<String,Map<String, RemoteLandmark>> entry : data.entrySet()) {
+                    String city = entry.getKey();
+                    Map<String, RemoteLandmark> cityLocations = entry.getValue();
+                    for(Map.Entry<String, RemoteLandmark> cityEntry : cityLocations.entrySet()){
+                        RemoteLandmark location = cityEntry.getValue();
+                        location.setId(cityEntry.getKey());
+                        location.setCity(city);
+                    }
+                }
+                List<Map<String, RemoteLandmark>> list = new ArrayList(data.values());
+                List<RemoteLandmark> locations = new ArrayList<>();
+                for(Map<String, RemoteLandmark> city : list){
+                    locations.addAll(city.values());
+                }
+                return Response.success(locations, HttpHeaderParser.parseCacheHeaders(response));
             } catch (UnsupportedEncodingException e) {
                 return Response.error(new ParseError(e));
             } catch (JsonSyntaxException e) {

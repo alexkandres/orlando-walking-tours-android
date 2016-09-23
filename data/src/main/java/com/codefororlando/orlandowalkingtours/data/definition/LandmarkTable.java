@@ -121,20 +121,18 @@ public class LandmarkTable extends AutoIncrementIdTable {
 
                 String name = landmark.name;
                 String description = landmark.description;
-                String streetAddress = landmark.streetAddress;
-                double[] coordinates = landmark.location.coordinates;
-                double longitude = coordinates[0];
-                double latitude = coordinates[1];
+                String streetAddress = landmark.address;
+                double longitude = landmark.location.longitude;
+                double latitude = landmark.location.latitude;
                 sqLiteStatement.clearBindings();
-                sqLiteStatement.bindLong(1, landmark.id);
+                sqLiteStatement.bindString(1, landmark.id);
                 sqLiteStatement.bindString(2, name);
                 sqLiteStatement.bindString(3, description);
                 sqLiteStatement.bindString(4, streetAddress);
                 sqLiteStatement.bindString(5, landmark.city);
-                sqLiteStatement.bindString(6, landmark.state);
-                sqLiteStatement.bindDouble(7, latitude);
-                sqLiteStatement.bindDouble(8, longitude);
-                sqLiteStatement.bindString(9, gson.toJson(landmark));
+                sqLiteStatement.bindDouble(6, latitude);
+                sqLiteStatement.bindDouble(7, longitude);
+                sqLiteStatement.bindString(8, gson.toJson(landmark));
 
                 long localId = sqLiteStatement.executeInsert();
                 if (localId > 0) {
